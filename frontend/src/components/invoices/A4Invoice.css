@@ -1,0 +1,233 @@
+/* Modal */
+.invoice-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  overflow-y: auto;
+}
+
+.invoice-modal-content {
+  background: white;
+  border-radius: 8px;
+  padding: 2rem;
+  max-width: 95%;
+  max-height: 95vh;
+  overflow-y: auto;
+}
+
+.invoice-actions {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  justify-content: center;
+}
+
+/* Facture A4 */
+.a4-invoice {
+  width: 210mm;
+  min-height: 297mm;
+  margin: 0 auto;
+  background: white;
+  padding: 20mm;
+  font-family: 'Arial', sans-serif;
+  font-size: 11pt;
+  color: #000;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+.invoice-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 2rem;
+}
+
+.clinic-info h1 {
+  font-size: 24pt;
+  margin: 0;
+  color: #2563eb;
+}
+
+.clinic-info p {
+  margin: 0.25rem 0;
+  font-size: 10pt;
+}
+
+.invoice-details {
+  text-align: right;
+}
+
+.invoice-details h2 {
+  font-size: 20pt;
+  margin: 0 0 1rem 0;
+  color: #1f2937;
+}
+
+.invoice-details p {
+  margin: 0.25rem 0;
+}
+
+.divider {
+  border-top: 2px solid #2563eb;
+  margin: 1.5rem 0;
+}
+
+.patient-section h3 {
+  font-size: 14pt;
+  margin-bottom: 1rem;
+  color: #1f2937;
+  border-bottom: 1px solid #e5e7eb;
+  padding-bottom: 0.5rem;
+}
+
+.patient-details {
+  display: flex;
+  gap: 3rem;
+}
+
+.patient-col {
+  flex: 1;
+}
+
+.patient-col p {
+  margin: 0.5rem 0;
+}
+
+.services-section h3 {
+  font-size: 14pt;
+  margin-bottom: 1rem;
+  color: #1f2937;
+}
+
+.services-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 2rem;
+}
+
+.services-table th {
+  background-color: #2563eb;
+  color: white;
+  padding: 0.75rem;
+  text-align: left;
+  font-weight: 600;
+}
+
+.services-table td {
+  padding: 0.75rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.services-table tbody tr:hover {
+  background-color: #f9fafb;
+}
+
+.col-description { width: 35%; }
+.col-qty { width: 8%; text-align: center; }
+.col-price { width: 15%; }
+.col-total { width: 15%; }
+.col-insurance { width: 15%; }
+.col-patient { width: 12%; }
+
+.text-center { text-align: center; }
+.text-right { text-align: right; }
+
+.totals-section {
+  margin-top: 2rem;
+  margin-left: auto;
+  width: 50%;
+}
+
+.totals-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5rem 0;
+}
+
+.totals-label {
+  font-weight: 600;
+}
+
+.totals-value {
+  font-weight: 600;
+}
+
+.insurance-color {
+  color: #059669;
+}
+
+.totals-divider {
+  border-top: 1px solid #e5e7eb;
+  margin: 0.5rem 0;
+}
+
+.total-due {
+  font-size: 14pt;
+  background-color: #f3f4f6;
+  padding: 0.75rem 1rem;
+  margin-top: 0.5rem;
+}
+
+.invoice-footer {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 3rem;
+  padding-top: 2rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+.footer-note {
+  flex: 1;
+}
+
+.footer-note p {
+  margin: 0.5rem 0;
+}
+
+.footer-signature {
+  text-align: center;
+}
+
+.signature-box {
+  width: 150px;
+  height: 80px;
+  border: 1px solid #000;
+  margin-top: 0.5rem;
+}
+
+/* Impression */
+@media print {
+  .invoice-modal-overlay {
+    position: static;
+    background: none;
+  }
+
+  .invoice-modal-content {
+    box-shadow: none;
+    padding: 0;
+    max-height: none;
+  }
+
+  .invoice-actions {
+    display: none;
+  }
+
+  .a4-invoice {
+    width: 210mm;
+    min-height: 297mm;
+    margin: 0;
+    padding: 15mm;
+    box-shadow: none;
+  }
+
+  @page {
+    size: A4;
+    margin: 0;
+  }
+}

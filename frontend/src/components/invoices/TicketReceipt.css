@@ -1,0 +1,171 @@
+/* Modal Overlay */
+.receipt-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.receipt-modal-content {
+  background: white;
+  border-radius: 8px;
+  padding: 2rem;
+  max-width: 500px;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+}
+
+.receipt-actions {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  justify-content: center;
+}
+
+/* Ticket de Caisse - Format Thermique */
+.ticket-receipt {
+  font-family: 'Courier New', Courier, monospace;
+  width: 80mm;  /* Largeur standard imprimante thermique */
+  margin: 0 auto;
+  background: white;
+  padding: 10mm;
+  color: #000;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.ticket-header {
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.ticket-header h2 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: bold;
+  letter-spacing: 1px;
+}
+
+.ticket-header p {
+  margin: 0.25rem 0;
+  font-size: 11px;
+}
+
+.ticket-divider {
+  margin: 0.5rem 0;
+  font-weight: normal;
+}
+
+.ticket-info p,
+.ticket-patient p,
+.ticket-total p {
+  margin: 0.3rem 0;
+  display: flex;
+  justify-content: space-between;
+}
+
+.ticket-info p strong,
+.ticket-patient p strong {
+  margin-right: 0.5rem;
+}
+
+.ticket-items {
+  margin: 1rem 0;
+}
+
+.ticket-items > p:first-child {
+  text-align: center;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+}
+
+.ticket-item {
+  margin: 0.5rem 0;
+}
+
+.ticket-item .item-name {
+  font-weight: bold;
+  margin: 0.2rem 0;
+}
+
+.ticket-item .item-price {
+  text-align: right;
+  margin: 0.2rem 0;
+}
+
+.ticket-item .item-insurance,
+.ticket-item .item-patient {
+  font-size: 10px;
+  margin: 0.1rem 0;
+  color: #555;
+}
+
+.ticket-item .item-insurance {
+  text-align: right;
+}
+
+.ticket-item .item-patient {
+  text-align: right;
+  font-weight: bold;
+  color: #000;
+}
+
+.ticket-total {
+  margin-top: 1rem;
+}
+
+.ticket-total .total-due {
+  font-size: 14px;
+  font-weight: bold;
+  margin-top: 0.5rem;
+}
+
+.ticket-footer {
+  text-align: center;
+  margin-top: 1.5rem;
+}
+
+.ticket-footer p {
+  margin: 0.3rem 0;
+}
+
+.ticket-small {
+  font-size: 10px;
+  color: #666;
+}
+
+/* Styles d'impression */
+@media print {
+  .receipt-modal-overlay {
+    position: static;
+    background: none;
+  }
+
+  .receipt-modal-content {
+    box-shadow: none;
+    padding: 0;
+    max-height: none;
+  }
+
+  .receipt-actions {
+    display: none;
+  }
+
+  .ticket-receipt {
+    width: 80mm;
+    margin: 0;
+    padding: 5mm;
+  }
+
+  @page {
+    size: 80mm auto;
+    margin: 0;
+  }
+}
