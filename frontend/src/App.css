@@ -561,3 +561,260 @@ tbody tr:last-child td {
   font-weight: 700;
   color: var(--dark-text);
 }
+
+/* Styles pour les onglets/tabs */
+.tab {
+  padding: 0.875rem 1.75rem;
+  border: none;
+  background: transparent;
+  color: var(--secondary-color);
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.625rem;
+  position: relative;
+  white-space: nowrap;
+}
+
+.tab::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.08) 0%, rgba(102, 126, 234, 0.05) 100%);
+  opacity: 0;
+  border-radius: 10px 10px 0 0;
+  transition: opacity 0.3s ease;
+}
+
+.tab:hover {
+  color: var(--primary-color);
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.05) 0%, rgba(102, 126, 234, 0.03) 100%);
+  border-radius: 10px 10px 0 0;
+  transform: translateY(-2px);
+}
+
+.tab:hover::before {
+  opacity: 1;
+}
+
+.tab svg {
+  font-size: 1.125rem;
+  transition: transform 0.3s ease;
+}
+
+.tab:hover svg {
+  transform: scale(1.15);
+}
+
+.tab-active {
+  padding: 0.875rem 1.75rem;
+  border: none;
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.12) 0%, rgba(102, 126, 234, 0.08) 100%);
+  color: var(--primary-color);
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  border-bottom: 3px solid var(--primary-color);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.625rem;
+  position: relative;
+  border-radius: 10px 10px 0 0;
+  box-shadow: 0 -2px 8px rgba(37, 99, 235, 0.15);
+  white-space: nowrap;
+}
+
+.tab-active::after {
+  content: '';
+  position: absolute;
+  bottom: -3px;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--primary-color) 0%, var(--info-color) 100%);
+  border-radius: 2px 2px 0 0;
+  animation: tabUnderline 0.4s ease-out;
+}
+
+@keyframes tabUnderline {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+.tab-active svg {
+  font-size: 1.125rem;
+  animation: tabIconPulse 0.5s ease-out;
+}
+
+@keyframes tabIconPulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Responsive pour les onglets */
+@media (max-width: 768px) {
+  .tab,
+  .tab-active {
+    padding: 0.75rem 1.25rem;
+    font-size: 0.85rem;
+  }
+
+  .tab svg,
+  .tab-active svg {
+    font-size: 1rem;
+  }
+}
+
+.alert-warning {
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  color: #92400e;
+  border-left: 4px solid #f59e0b;
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.2);
+}
+
+.close-btn {
+  background: transparent;
+  border: none;
+  font-size: 1.5rem;
+  color: var(--secondary-color);
+  cursor: pointer;
+  padding: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.close-btn:hover {
+  background: var(--danger-color);
+  color: white;
+  transform: rotate(90deg);
+}
+
+.modal-content {
+  background: white;
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  animation: slideUp 0.3s ease-out;
+}
+
+/* Styles pour l'impression */
+@media print {
+  /* Masquer les éléments non imprimables */
+  .no-print,
+  .sidebar,
+  .navbar,
+  button:not(.print-only button),
+  .icon-button,
+  .modal-overlay,
+  .page-header,
+  input[type="date"],
+  select {
+    display: none !important;
+  }
+
+  /* Afficher les éléments destinés uniquement à l'impression */
+  .print-only {
+    display: block !important;
+  }
+
+  /* Ajuster la mise en page pour l'impression */
+  body {
+    margin: 0;
+    padding: 0;
+    background: white;
+  }
+
+  .page-container {
+    padding: 1rem;
+    max-width: 100%;
+  }
+
+  .printable-section {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  /* Optimiser les tableaux pour l'impression */
+  table {
+    page-break-inside: auto;
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  tr {
+    page-break-inside: avoid;
+    page-break-after: auto;
+  }
+
+  thead {
+    display: table-header-group;
+  }
+
+  tfoot {
+    display: table-footer-group;
+  }
+
+  /* Optimiser les cartes pour l'impression */
+  .card {
+    page-break-inside: avoid;
+    box-shadow: none !important;
+    border: 1px solid #ddd;
+    margin-bottom: 1rem;
+  }
+
+  .stat-card {
+    border: 1px solid #ddd;
+    box-shadow: none !important;
+  }
+
+  /* Ajuster les couleurs pour l'impression */
+  .badge {
+    border: 1px solid currentColor;
+  }
+
+  /* Ajuster les titres */
+  h1, h2, h3 {
+    page-break-after: avoid;
+  }
+
+  /* Taille de police pour l'impression */
+  body {
+    font-size: 11pt;
+  }
+
+  table {
+    font-size: 10pt;
+  }
+
+  .stat-card-value {
+    font-size: 1.5rem;
+  }
+
+  /* Marges de page */
+  @page {
+    margin: 1.5cm;
+    size: A4 portrait;
+  }
+}

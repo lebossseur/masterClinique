@@ -4,7 +4,9 @@ exports.getAllDoctors = async (req, res) => {
   try {
     const [doctors] = await db.query(
       `SELECT d.*,
-              CONCAT(u.first_name, ' ', u.last_name) as full_name,
+              COALESCE(d.first_name, u.first_name) as first_name,
+              COALESCE(d.last_name, u.last_name) as last_name,
+              CONCAT(COALESCE(d.first_name, u.first_name), ' ', COALESCE(d.last_name, u.last_name)) as full_name,
               u.first_name as user_first_name,
               u.last_name as user_last_name
        FROM doctors d
@@ -29,8 +31,10 @@ exports.getDoctorById = async (req, res) => {
   try {
     const [doctors] = await db.query(
       `SELECT d.*,
-              CONCAT(u.first_name, ' ', u.last_name) as full_name,
-              u.first_name, u.last_name, u.email as user_email
+              COALESCE(d.first_name, u.first_name) as first_name,
+              COALESCE(d.last_name, u.last_name) as last_name,
+              CONCAT(COALESCE(d.first_name, u.first_name), ' ', COALESCE(d.last_name, u.last_name)) as full_name,
+              u.email as user_email
        FROM doctors d
        LEFT JOIN users u ON d.user_id = u.id
        WHERE d.id = ?`,
@@ -61,6 +65,8 @@ exports.createDoctor = async (req, res) => {
   try {
     const {
       user_id,
+      first_name,
+      last_name,
       specialization,
       license_number,
       qualification,
@@ -78,11 +84,19 @@ exports.createDoctor = async (req, res) => {
       });
     }
 
+    // Si pas de user_id, first_name et last_name deviennent obligatoires
+    if (!user_id && (!first_name || !last_name)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Le prénom et le nom sont requis si aucun utilisateur n\'est associé.'
+      });
+    }
+
     const [result] = await db.query(
-      `INSERT INTO doctors (user_id, specialization, license_number, qualification,
+      `INSERT INTO doctors (user_id, first_name, last_name, specialization, license_number, qualification,
                            experience_years, consultation_fee, phone, email, is_active)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      [user_id || null, specialization, license_number, qualification,
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [user_id || null, first_name || null, last_name || null, specialization, license_number, qualification,
        experience_years, consultation_fee, phone, email, is_active !== false]
     );
 
@@ -104,6 +118,8 @@ exports.updateDoctor = async (req, res) => {
   try {
     const {
       user_id,
+      first_name,
+      last_name,
       specialization,
       license_number,
       qualification,
@@ -115,11 +131,12 @@ exports.updateDoctor = async (req, res) => {
     } = req.body;
 
     await db.query(
-      `UPDATE doctors SET user_id = ?, specialization = ?, license_number = ?,
+      `UPDATE doctors SET user_id = ?, first_name = ?, last_name = ?,
+       specialization = ?, license_number = ?,
        qualification = ?, experience_years = ?, consultation_fee = ?,
        phone = ?, email = ?, is_active = ?
        WHERE id = ?`,
-      [user_id || null, specialization, license_number, qualification,
+      [user_id || null, first_name || null, last_name || null, specialization, license_number, qualification,
        experience_years, consultation_fee, phone, email,
        is_active !== false, req.params.id]
     );

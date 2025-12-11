@@ -5,13 +5,13 @@ exports.getAllAppointments = async (req, res) => {
   try {
     const [appointments] = await db.query(
       `SELECT a.*,
-              CONCAT(p.first_name, ' ', p.last_name) as patient_name,
+              CONCAT(p.last_name, ' ', p.first_name) as patient_name,
               p.patient_number,
-              CONCAT(d.first_name, ' ', d.last_name) as doctor_name,
+              CONCAT('Dr. ', COALESCE(d.last_name, ''), ' ', COALESCE(d.first_name, '')) as doctor_name,
               CONCAT(u.first_name, ' ', u.last_name) as created_by_name
        FROM appointments a
        JOIN patients p ON a.patient_id = p.id
-       LEFT JOIN users d ON a.doctor_id = d.id
+       LEFT JOIN doctors d ON a.doctor_id = d.id
        LEFT JOIN users u ON a.created_by = u.id
        ORDER BY a.appointment_date DESC, a.appointment_time DESC`
     );
@@ -215,10 +215,12 @@ exports.getTodayAppointments = async (req, res) => {
   try {
     const [appointments] = await db.query(
       `SELECT a.*,
-              CONCAT(p.first_name, ' ', p.last_name) as patient_name,
-              p.patient_number, p.phone as patient_phone
+              CONCAT(p.last_name, ' ', p.first_name) as patient_name,
+              p.patient_number, p.phone as patient_phone,
+              CONCAT('Dr. ', COALESCE(d.last_name, ''), ' ', COALESCE(d.first_name, '')) as doctor_name
        FROM appointments a
        JOIN patients p ON a.patient_id = p.id
+       LEFT JOIN doctors d ON a.doctor_id = d.id
        WHERE a.appointment_date = CURDATE()
        ORDER BY a.appointment_time ASC`
     );

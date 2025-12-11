@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import {
   FaHome, FaChartBar, FaUsers, FaCalendar, FaFileInvoiceDollar,
   FaShieldAlt, FaPills, FaChartLine, FaCog,
-  FaBars, FaTimes, FaSignOutAlt
+  FaBars, FaTimes, FaSignOutAlt, FaFlask, FaStethoscope
 } from 'react-icons/fa';
 import './Layout.css';
 
@@ -20,13 +20,15 @@ const Layout = () => {
   };
 
   const menuItems = [
-    { path: '/', icon: FaHome, label: 'Accueil', roles: null },
+    { path: '/', icon: FaHome, label: 'Accueil', roles: ['ADMIN', 'SUPERVISOR', 'ACCUEIL', 'CAISSE', 'ASSURANCE', 'PHARMACIE', 'LABORATOIRE'] },
     { path: '/dashboard', icon: FaChartBar, label: 'Tableau de bord', roles: ['ADMIN', 'SUPERVISOR'] },
-    { path: '/patients', icon: FaUsers, label: 'Patients', roles: null },
-    { path: '/appointments', icon: FaCalendar, label: 'Rendez-vous', roles: null },
+    { path: '/patients', icon: FaUsers, label: 'Patients', roles: ['ADMIN', 'SUPERVISOR', 'ACCUEIL', 'CAISSE', 'ASSURANCE'] },
+    { path: '/appointments', icon: FaCalendar, label: 'Rendez-vous', roles: ['ADMIN', 'SUPERVISOR', 'ACCUEIL'] },
     { path: '/invoices', icon: FaFileInvoiceDollar, label: 'Caisse & Facturation', roles: ['ADMIN', 'SUPERVISOR', 'CAISSE'] },
     { path: '/insurance', icon: FaShieldAlt, label: 'Assurance', roles: ['ADMIN', 'SUPERVISOR', 'ASSURANCE'] },
     { path: '/pharmacy', icon: FaPills, label: 'Pharmacie', roles: ['ADMIN', 'SUPERVISOR', 'PHARMACIE'] },
+    { path: '/laboratory', icon: FaFlask, label: 'Laboratoire', roles: ['ADMIN', 'SUPERVISOR', 'LABORATOIRE'] },
+    { path: '/medicine', icon: FaStethoscope, label: 'Médecine', roles: ['MEDECIN'] },
     { path: '/accounting', icon: FaChartLine, label: 'Comptabilité', roles: ['ADMIN', 'SUPERVISOR'] },
     { path: '/configuration', icon: FaCog, label: 'Configuration', roles: ['ADMIN'] }
   ];

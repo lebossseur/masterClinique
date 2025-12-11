@@ -10,6 +10,7 @@ import Invoices from './pages/Invoices';
 import Insurance from './pages/Insurance';
 import InsuranceInvoicePrint from './components/InsuranceInvoicePrint';
 import Pharmacy from './pages/Pharmacy';
+import Medicine from './pages/Medicine';
 import Accounting from './pages/Accounting';
 import Configuration from './pages/Configuration';
 import Test from './pages/Test';
@@ -67,6 +68,11 @@ function AppRoutes() {
         <Route path="pharmacy" element={
           <PrivateRoute roles={['ADMIN', 'SUPERVISOR', 'PHARMACIE']}>
             <Pharmacy />
+          </PrivateRoute>
+        } />
+        <Route path="medicine" element={
+          <PrivateRoute roles={['MEDECIN']}>
+            <Medicine />
           </PrivateRoute>
         } />
         <Route path="accounting" element={

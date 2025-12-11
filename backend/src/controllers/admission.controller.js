@@ -244,11 +244,11 @@ exports.getWaitingAdmissions = async (req, res) => {
   try {
     const [admissions] = await db.query(
       `SELECT
-        a.id, a.admission_number, a.consultation_type, a.consultation_reason,
+        a.id, a.admission_number, a.created_at as admission_date, a.consultation_type, a.consultation_reason,
         a.has_insurance, a.status, a.created_at,
         a.base_price, a.coverage_percentage, a.insurance_amount, a.patient_amount,
         a.is_control, a.original_admission_id, a.control_valid_until,
-        CONCAT(p.first_name, ' ', p.last_name) as patient_name,
+        CONCAT(p.last_name, ' ', p.first_name) as patient_name,
         p.patient_number, p.phone as patient_phone,
         CONCAT(u.first_name, ' ', u.last_name) as created_by_name,
         ic.name as insurance_company_name, a.insurance_number,

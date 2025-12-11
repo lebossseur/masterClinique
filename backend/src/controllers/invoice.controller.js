@@ -198,13 +198,48 @@ exports.getAllInvoices = async (req, res) => {
       `SELECT i.*,
               CONCAT(p.first_name, ' ', p.last_name) as patient_name,
               p.patient_number,
+              a.has_insurance,
+              a.insurance_company_id,
+              ic.name as insurance_company_name,
+              a.insurance_number,
               COALESCE((SELECT SUM(pay.amount)
                         FROM payments pay
-                        WHERE pay.invoice_id = i.id), 0) as total_paid
+                        WHERE pay.invoice_id = i.id), 0) as paid_amount,
+              CASE
+                WHEN COALESCE((SELECT SUM(pay.amount) FROM payments pay WHERE pay.invoice_id = i.id), 0) >= i.patient_responsibility THEN 'PAID'
+                WHEN COALESCE((SELECT SUM(pay.amount) FROM payments pay WHERE pay.invoice_id = i.id), 0) > 0 THEN 'PARTIAL'
+                ELSE 'UNPAID'
+              END as payment_status
        FROM invoices i
        JOIN patients p ON i.patient_id = p.id
+       LEFT JOIN admissions a ON i.admission_id = a.id
+       LEFT JOIN insurance_companies ic ON a.insurance_company_id = ic.id
        ORDER BY i.created_at DESC`
     );
+
+    // Récupérer les items pour chaque facture
+    for (let invoice of invoices) {
+      const [items] = await db.query(
+        `SELECT ii.*,
+                asv.service_code, asv.insurance_covered, asv.patient_pays
+         FROM invoice_items ii
+         LEFT JOIN admission_services asv ON ii.description = asv.service_name AND asv.admission_id = ?
+         WHERE ii.invoice_id = ?`,
+        [invoice.admission_id, invoice.id]
+      );
+      invoice.items = items;
+    }
+
+    // Debug: Logger un exemple de facture
+    if (invoices.length > 0) {
+      console.log('=== EXEMPLE FACTURE ===');
+      console.log('Invoice Number:', invoices[0].invoice_number);
+      console.log('Patient Responsibility:', invoices[0].patient_responsibility);
+      console.log('Paid Amount:', invoices[0].paid_amount);
+      console.log('Status:', invoices[0].status);
+      console.log('Payment Status:', invoices[0].payment_status);
+      console.log('====================');
+    }
 
     res.json({
       success: true,
@@ -380,6 +415,23 @@ exports.recordPayment = async (req, res) => {
         invoice_id, cash_register_id, payment_number, payment_date, payment_time, amount, payment_method, reference_number, notes, received_by
       ) VALUES (?, ?, ?, CURDATE(), CURTIME(), ?, ?, ?, ?, ?)`,
       [invoice_id, cash_register_id, payment_number, amount, payment_method, reference || null, notes || null, req.user.id]
+    );
+
+    // Créer une transaction de comptabilité pour ce paiement (REVENU)
+    const transactionNumber = `TRX-${Date.now()}`;
+    await db.query(
+      `INSERT INTO accounting_transactions (
+        transaction_number, transaction_date, transaction_type, category,
+        amount, payment_method, reference_type, reference_id, description, created_by
+      ) VALUES (?, CURDATE(), 'INCOME', 'PAYMENT', ?, ?, 'PAYMENT', ?, ?, ?)`,
+      [
+        transactionNumber,
+        amount,
+        payment_method,
+        invoice_id,
+        `Paiement facture ${invoice.invoice_number} - ${payment_number}`,
+        req.user.id
+      ]
     );
 
     // Mettre à jour le statut de la facture

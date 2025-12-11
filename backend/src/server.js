@@ -31,6 +31,7 @@ const pricingRoutes = require('./routes/pricing.routes');
 const healthCenterRoutes = require('./routes/healthcenter.routes');
 const doctorRoutes = require('./routes/doctor.routes');
 const cashRegisterRoutes = require('./routes/cashRegister.routes');
+const medicalRecordRoutes = require('./routes/medicalRecord.routes');
 
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
@@ -45,6 +46,7 @@ app.use('/api/pricing', pricingRoutes);
 app.use('/api/health-center', healthCenterRoutes);
 app.use('/api/doctors', doctorRoutes);
 app.use('/api/cash-registers', cashRegisterRoutes);
+app.use('/api/medical-records', medicalRecordRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {

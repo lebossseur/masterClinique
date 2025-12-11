@@ -24,49 +24,79 @@ exports.getAllTransactions = async (req, res) => {
 
 exports.getDashboardStats = async (req, res) => {
   try {
+    // Revenus du jour (basés sur les paiements effectivement reçus)
     const [incomeToday] = await db.query(
-      `SELECT SUM(amount) as total FROM accounting_transactions
-       WHERE transaction_type = 'INCOME' AND transaction_date = CURDATE()`
+      `SELECT SUM(amount) as total FROM payments
+       WHERE payment_date = CURDATE()`
     );
 
+    // Dépenses du jour
     const [expenseToday] = await db.query(
       `SELECT SUM(amount) as total FROM accounting_transactions
        WHERE transaction_type = 'EXPENSE' AND transaction_date = CURDATE()`
     );
 
+    // Revenus du mois (basés sur les paiements effectivement reçus)
     const [incomeMonth] = await db.query(
-      `SELECT SUM(amount) as total FROM accounting_transactions
-       WHERE transaction_type = 'INCOME' AND MONTH(transaction_date) = MONTH(CURDATE())
-       AND YEAR(transaction_date) = YEAR(CURDATE())`
+      `SELECT SUM(amount) as total FROM payments
+       WHERE MONTH(payment_date) = MONTH(CURDATE())
+       AND YEAR(payment_date) = YEAR(CURDATE())`
     );
 
+    // Dépenses du mois
     const [expenseMonth] = await db.query(
       `SELECT SUM(amount) as total FROM accounting_transactions
        WHERE transaction_type = 'EXPENSE' AND MONTH(transaction_date) = MONTH(CURDATE())
        AND YEAR(transaction_date) = YEAR(CURDATE())`
     );
 
+    // Factures en attente (non payées et partiellement payées)
     const [pendingInvoices] = await db.query(
-      `SELECT COUNT(*) as count, SUM(patient_responsibility) as total
-       FROM invoices WHERE status = 'PENDING'`
+      `SELECT
+        COUNT(*) as count,
+        SUM(i.patient_responsibility - COALESCE(p.total_paid, 0)) as total
+       FROM invoices i
+       LEFT JOIN (
+         SELECT invoice_id, SUM(amount) as total_paid
+         FROM payments
+         GROUP BY invoice_id
+       ) p ON i.id = p.invoice_id
+       WHERE i.status IN ('PENDING', 'PARTIAL')`
     );
+
+    // Statistiques détaillées des factures
+    const [invoiceStats] = await db.query(
+      `SELECT
+        COUNT(*) as total_invoices,
+        SUM(total_amount) as total_billed,
+        SUM(patient_responsibility) as total_patient_due
+       FROM invoices
+       WHERE invoice_date = CURDATE()`
+    );
+
+    const todayIncome = parseFloat(incomeToday[0]?.total || 0);
+    const todayExpense = parseFloat(expenseToday[0]?.total || 0);
+    const monthIncome = parseFloat(incomeMonth[0]?.total || 0);
+    const monthExpense = parseFloat(expenseMonth[0]?.total || 0);
 
     res.json({
       success: true,
       data: {
         today: {
-          income: incomeToday[0].total || 0,
-          expense: expenseToday[0].total || 0,
-          net: (incomeToday[0].total || 0) - (expenseToday[0].total || 0)
+          income: todayIncome,
+          expense: todayExpense,
+          net: todayIncome - todayExpense,
+          invoices: invoiceStats[0]?.total_invoices || 0,
+          billed: parseFloat(invoiceStats[0]?.total_billed || 0)
         },
         month: {
-          income: incomeMonth[0].total || 0,
-          expense: expenseMonth[0].total || 0,
-          net: (incomeMonth[0].total || 0) - (expenseMonth[0].total || 0)
+          income: monthIncome,
+          expense: monthExpense,
+          net: monthIncome - monthExpense
         },
         pending: {
-          count: pendingInvoices[0].count || 0,
-          total: pendingInvoices[0].total || 0
+          count: pendingInvoices[0]?.count || 0,
+          total: parseFloat(pendingInvoices[0]?.total || 0)
         }
       }
     });
@@ -107,23 +137,27 @@ exports.getAllExpenses = async (req, res) => {
 exports.createExpense = async (req, res) => {
   try {
     const {
-      expense_number, expense_date, category, description, amount,
+      transaction_date, category, description, amount,
       payment_method, vendor, receipt_number
     } = req.body;
 
-    if (!expense_number || !expense_date || !category || !description || !amount || !payment_method) {
+    if (!category || !amount || !payment_method) {
       return res.status(400).json({
         success: false,
         message: 'Les champs obligatoires sont requis.'
       });
     }
 
+    // Générer un numéro de dépense unique
+    const expense_number = `EXP-${Date.now()}`;
+    const expense_date = transaction_date || new Date().toISOString().split('T')[0];
+
     const [result] = await db.query(
       `INSERT INTO expenses (expense_number, expense_date, category, description,
        amount, payment_method, vendor, receipt_number, created_by)
        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      [expense_number, expense_date, category, description, amount,
-       payment_method, vendor, receipt_number, req.user.id]
+      [expense_number, expense_date, category, description || '', amount,
+       payment_method, vendor || null, receipt_number || null, req.user.id]
     );
 
     res.status(201).json({
